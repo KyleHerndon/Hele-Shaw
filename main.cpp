@@ -5,8 +5,8 @@
 
 #define simSize 128
 #define filterSize 2 // edges of length 2*filterSize+1
-#define A 0.5
-#define B 0.0
+#define A 1
+#define B 0.5
 
 static int nl(Mesh* mesh, const Loc& start, const Loc& end) {
 	int ret = 0;
@@ -37,7 +37,7 @@ int main() {
 			Loc next = neighbors[rand() % mesh->neighbors()];
 			delete neighbors;
 			if (mesh->value(next) > 0) { // possible collision
-				if (A * (nl(mesh, walker, next) - (filterSize/(filterSize*2+1))) + B < rand()) { // probability
+				if (A * (nl(mesh, walker, next)/(1.0*(filterSize*2+1)*(filterSize*2+1)) - (filterSize/(filterSize*2.0+1.0))) + B > (rand()*1.0/RAND_MAX)) { // probability
 					mesh->value(walker, collisions);
 					collisions++;
 					collided = 1; // breaks loop
