@@ -30,9 +30,9 @@ SquareMesh::SquareMesh(const SquareMesh& mesh) {
 	this->filterLength = mesh.filterLength;
 	this->vals = new int*[this->ylength];
 	for (unsigned i = 0; i < this->ylength; i++) {
-		this->vals[i] = new int[this->xlength];
-		if (i > this->ylength/4 && i < (3 * this->ylength)/4) {
-			std::memcpy(&this->vals[i][this->xlength/4],mesh.vals[i],sizeof(Loc)*mesh.xlength);
+		this->vals[i] = new int[this->xlength]();
+		if (i >= this->ylength/4 && i < (3 * this->ylength)/4) {
+			std::memcpy(&this->vals[i][this->xlength/4],mesh.vals[i-this->ylength/4],mesh.xlength*sizeof(int));
 		}
 	}
 }
@@ -94,10 +94,10 @@ Loc* SquareMesh::neighbors(const Loc& c) {
 		locs[i].x=c.x;
 		locs[i].y=c.y;
 	}
-	locs[0].x = locs[0].x != (int) xlength-1 ? locs[0].x + 1 : 0;
-	locs[1].y = locs[1].y != (int) ylength-1 ? locs[1].y + 1 : 0;
-	locs[2].x = locs[2].x != 0 ? locs[2].x - 1 : xlength-1;
-	locs[3].y = locs[3].y != 0 ? locs[3].y - 1 : ylength-1;
+	locs[0].x = (locs[0].x + 1) % xlength;
+	locs[1].y = (locs[0].y + 1) % xlength;
+	locs[2].x = (locs[0].x - 1) % ylength;
+	locs[3].y = (locs[0].y - 1) % ylength;
 	return locs;
 }
 
@@ -124,9 +124,9 @@ Loc* SquareMesh::edges() {
 }
 
 Loc** SquareMesh::matrix(const Loc& start, const Loc& collision) {
-	if (abs(start.x-collision.x) + abs(start.y-collision.y) != 1) { // Check cells are adjacent
+	/*if (abs(start.x-collision.x) + abs(start.y-collision.y) != 1) { // Check cells are adjacent
 		return NULL;
-	}
+	}*/
 	unsigned fullLength = 2*filterLength+1;
 
 	Loc* positives = new Loc[fullLength * (filterLength)];
@@ -137,7 +137,6 @@ Loc** SquareMesh::matrix(const Loc& start, const Loc& collision) {
 	ret[1]=negatives;
 	int switchXY = abs(start.y-collision.y) != 1 ? 0 : 1;
 	int side  = start.x > collision.x || start.y > collision.y ? -1 : 1;
-
 	for (unsigned i = 0; i < fullLength; i++) {
 		for (unsigned j = 0; j < filterLength; j++) {
 			int dx = switchXY ? i : side * j;
