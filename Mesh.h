@@ -10,5 +10,6 @@ class Mesh {
 		virtual void value(const Loc& c, int value) = 0;
 		virtual int neighbors() = 0;
 		virtual Loc* neighbors(const Loc& c) = 0;
+		virtual Loc* edges() = 0;
 		virtual Loc** matrix(const Loc& start, const Loc& collision) = 0;
 };

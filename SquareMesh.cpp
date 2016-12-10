@@ -1,6 +1,8 @@
 #include <new>
 #include <stdlib.h> 
 #include <stdio.h>
+#include <algorithm>
+#include <cstring>
 
 #include "SquareMesh.h"
 
@@ -22,12 +24,43 @@ SquareMesh::SquareMesh(unsigned xlength, unsigned ylength, unsigned filterLength
 	this->filterLength = filterLength;
 }
 
+SquareMesh::SquareMesh(const SquareMesh& mesh) {
+	this->xlength = mesh.xlength*2;
+	this->ylength = mesh.ylength*2;
+	this->filterLength = mesh.filterLength;
+	this->vals = new int*[this->ylength];
+	for (unsigned i = 0; i < this->ylength; i++) {
+		this->vals[i] = new int[this->xlength];
+		if (i > this->ylength/4 && i < (3 * this->ylength)/4) {
+			std::memcpy(&this->vals[i][this->xlength/4],mesh.vals[i],sizeof(Loc)*mesh.xlength);
+		}
+	}
+}
+
 int SquareMesh::value(const Loc& c) {
 	return vals[c.x%xlength][c.y%ylength];
 }
 
 void SquareMesh::value(const Loc& c, int value) {
 	vals[c.x%xlength][c.y%ylength] = value;
+}
+
+int SquareMesh::holeless(const Loc& c) {
+	int adjacent = 0;
+	Loc* neighbors = SquareMesh::neighbors(c);
+	for (int i = 0; i < 4; i++) {
+		adjacent += SquareMesh::value(neighbors[i]) > 0 ? 1 : 0;
+	}
+	delete neighbors;
+	if (adjacent == 3) {
+		return 1;
+	} else if (adjacent == 2) {
+		return 0;
+	}
+	if (vals[(c.x-1)%xlength][(c.y-1)%ylength] || vals[(c.x-1)%xlength][(c.y+1)%ylength] || vals[(c.x+1)%xlength][(c.y-1)%ylength] || vals[(c.x+1)%xlength][(c.y+1)%ylength]) { // if any diagonal is occupied
+		return 0;
+	}
+	return 1;
 }
 
 int SquareMesh::neighbors() {
@@ -45,6 +78,28 @@ Loc* SquareMesh::neighbors(const Loc& c) {
 	locs[2].x = locs[2].x != 0 ? locs[2].x - 1 : xlength-1;
 	locs[3].y = locs[3].y != 0 ? locs[3].y - 1 : ylength-1;
 	return locs;
+}
+
+Loc* SquareMesh::edges() {
+	Loc* ret = new Loc[2*xlength+2*ylength-4];
+	int index = 0;
+	for (unsigned i = 0; i < xlength; i++) {
+		ret[index].x = i;
+		ret[index].y = 0;
+		index++;
+		ret[index].x = i;
+		ret[index].y = ylength-1;
+		index++;
+	}
+	for (unsigned i = 1; i < ylength-1; i++) {
+		ret[index].x = 0;
+		ret[index].y = i;
+		index++;
+		ret[index].x = xlength-1;
+		ret[index].y = i;
+		index++;
+	}
+	return ret;
 }
 
 Loc** SquareMesh::matrix(const Loc& start, const Loc& collision) {
