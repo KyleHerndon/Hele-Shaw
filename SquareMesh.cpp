@@ -95,9 +95,9 @@ Loc* SquareMesh::neighbors(const Loc& c) {
 		locs[i].y=c.y;
 	}
 	locs[0].x = (locs[0].x + 1) % xlength;
-	locs[1].y = (locs[0].y + 1) % xlength;
-	locs[2].x = (locs[0].x - 1) % ylength;
-	locs[3].y = (locs[0].y - 1) % ylength;
+	locs[1].y = (locs[1].y + 1) % xlength;
+	locs[2].x = (locs[2].x - 1) % ylength;
+	locs[3].y = (locs[3].y - 1) % ylength;
 	return locs;
 }
 

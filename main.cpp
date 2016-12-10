@@ -5,7 +5,7 @@
 #include "SquareMesh.h"
 
 #define simStart 64 // keep at powers of 2
-#define simSize 1024 // keep at powers of 2
+#define simSize 128 // keep at powers of 2
 #define filterSize 2 // edges of length 2*filterSize+1
 #define A 1.0
 #define B 0.5
@@ -28,6 +28,7 @@ static int nl(Mesh* mesh, const Loc& start, const Loc& end) {
 }
 
 int main() {
+	srand(532);
 	int currentSize = simStart;
 	SquareMesh* mesh;
 	int collisions = 1;
