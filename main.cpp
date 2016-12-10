@@ -3,7 +3,7 @@
 
 #include "SquareMesh.h"
 
-#define simSize 128
+#define simSize 128 // keep at powers of 2
 #define filterSize 2 // edges of length 2*filterSize+1
 #define A 1
 #define B 0.5
@@ -27,17 +27,18 @@ int main() {
 	Mesh* mesh = new SquareMesh(simSize,simSize,filterSize);
 	int collisions = 0;
 	int onEdge = 0;
+	Loc* edges = mesh->edges();
+	int edgesLength = simSize*4-4;
 	while (!onEdge) { // Simulation Loop
 		Loc walker;
-		walker.x = rand()%simSize;
-		walker.y = rand()%simSize;
+		walker = edges[rand()%edgesLength];
 		int collided = 0;
 		while (!collided) { // Randomly move walker
 			Loc* neighbors = mesh->neighbors(walker);
 			Loc next = neighbors[rand() % mesh->neighbors()];
 			delete neighbors;
 			if (mesh->value(next) > 0) { // possible collision
-				if (A * (nl(mesh, walker, next)/(1.0*(filterSize*2+1)*(filterSize*2+1)) - (filterSize/(filterSize*2.0+1.0))) + B > (rand()*1.0/RAND_MAX)) { // probability
+				if (mesh->valid(walker) && A * (nl(mesh, walker, next)/(1.0*(filterSize*2+1)*(filterSize*2+1)) - (filterSize/(filterSize*2.0+1.0))) + B > (rand()*1.0/RAND_MAX)) { // probability
 					mesh->value(walker, collisions);
 					collisions++;
 					collided = 1; // breaks loop
@@ -51,5 +52,8 @@ int main() {
 		}
 		printf("%d\n", collisions);
 	}
+	mesh->output();
+	delete edges;
+	delete mesh;
 	return 0;
 }

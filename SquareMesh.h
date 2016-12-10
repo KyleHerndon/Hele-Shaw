@@ -6,7 +6,8 @@ class SquareMesh : public Mesh {
 		SquareMesh(const SquareMesh& mesh);
 		int value(const Loc& c); // 0 is empty, 1 is occupied, -1 DNE
 		void value(const Loc& c, int value);
-		int holeless(const Loc& c);
+		void output();
+		int valid(const Loc& c);
 		int neighbors();
 		Loc* neighbors(const Loc& c);
 		Loc* edges();

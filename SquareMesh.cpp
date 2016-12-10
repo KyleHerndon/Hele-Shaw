@@ -45,22 +45,43 @@ void SquareMesh::value(const Loc& c, int value) {
 	vals[c.x%xlength][c.y%ylength] = value;
 }
 
-int SquareMesh::holeless(const Loc& c) {
-	int adjacent = 0;
-	Loc* neighbors = SquareMesh::neighbors(c);
-	for (int i = 0; i < 4; i++) {
-		adjacent += SquareMesh::value(neighbors[i]) > 0 ? 1 : 0;
+void SquareMesh::output() {
+	for (unsigned i = 0; i < xlength; i++) {
+		for (unsigned j = 0; j < ylength; j++) {
+			if (vals[i][j]) {
+				printf("█");
+			} else {
+				printf(" ");
+			}
+		}
+		printf("\n");
 	}
-	delete neighbors;
-	if (adjacent == 3) {
+}
+
+int SquareMesh::valid(const Loc& c) { // returns true if setting the value at c to be > 1 can not cause unfilled gaps
+	int separators = 0;
+	Loc locs[8];
+	locs[0].x = c.x -1; locs[0]. y = c.y -1;
+	locs[1].x = c.x -1; locs[1]. y = c.y -0;
+	locs[2].x = c.x -1; locs[2]. y = c.y +1;
+	locs[3].x = c.x -0; locs[3]. y = c.y +1;
+	locs[4].x = c.x +1; locs[4]. y = c.y +1;
+	locs[5].x = c.x +1; locs[5]. y = c.y -0;
+	locs[6].x = c.x +1; locs[6]. y = c.y -1;
+	locs[7].x = c.x -0; locs[7]. y = c.y -1;
+	int prevVal = SquareMesh::value(locs[7]) > 0 ? 1 : 0;
+	for (int i = 0; i < 8; i++) {
+		int newVal = SquareMesh::value(locs[i]) ? 1 : 0;
+		if (prevVal != newVal) {
+			separators++;
+		}
+		prevVal = newVal;
+	}
+	if (separators == 2) {
 		return 1;
-	} else if (adjacent == 2) {
+	} else {
 		return 0;
 	}
-	if (vals[(c.x-1)%xlength][(c.y-1)%ylength] || vals[(c.x-1)%xlength][(c.y+1)%ylength] || vals[(c.x+1)%xlength][(c.y-1)%ylength] || vals[(c.x+1)%xlength][(c.y+1)%ylength]) { // if any diagonal is occupied
-		return 0;
-	}
-	return 1;
 }
 
 int SquareMesh::neighbors() {
