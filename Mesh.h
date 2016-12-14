@@ -1,3 +1,5 @@
+#include <fstream>
+
 struct Loc {
 	int x;
 	int y;
@@ -8,7 +10,7 @@ class Mesh {
 		virtual ~Mesh() {};
 		virtual int value(const Loc& c) = 0; // 0 is empty, 1 is occupied, -1 DNE
 		virtual void value(const Loc& c, int value) = 0;
-		virtual void output() = 0;
+		virtual void output(std::ofstream& output) = 0;
 		virtual int valid(const Loc& c) = 0;
 		virtual int neighbors() = 0;
 		virtual Loc* neighbors(const Loc& c) = 0;

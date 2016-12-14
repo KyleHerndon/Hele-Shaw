@@ -45,16 +45,16 @@ void SquareMesh::value(const Loc& c, int value) {
 	vals[c.x%xlength][c.y%ylength] = value;
 }
 
-void SquareMesh::output() {
+void SquareMesh::output(std::ofstream& output) {
 	for (unsigned i = 0; i < xlength; i++) {
 		for (unsigned j = 0; j < ylength; j++) {
 			if (vals[i][j]) {
-				printf("█");
+				output << "1 ";
 			} else {
-				printf(" ");
+				output << "0 ";
 			}
 		}
-		printf("\n");
+		output << "\n";
 	}
 }
 

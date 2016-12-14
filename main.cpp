@@ -2,14 +2,18 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include <fstream>
+#include <iostream>
+#include <string>
+
 #include "SquareMesh.h"
 
-#define simStart 64 // keep at powers of 2
-#define simSize 128 // keep at powers of 2
-#define filterSize 2 // edges of length 2*filterSize+1
-#define A 1.0
-#define B 0.5
-#define C 0.0
+#define simStart 16 // keep at powers of 2
+unsigned simSize = 256; // keep at powers of 2
+unsigned filterSize = 2; // edges of length 2*filterSize+1
+double A = 1.0;
+double B = 0.5;
+double C = 0.0;
 
 static int nl(Mesh* mesh, const Loc& start, const Loc& end) {
 	int ret = 0;
@@ -27,8 +31,18 @@ static int nl(Mesh* mesh, const Loc& start, const Loc& end) {
 	return ret;
 }
 
-int main() {
-	srand(532);
+int main(int argc, char* argv[]) {
+	if (argc != 7) {
+		std::cout << "usage: " << argv[0] << " <filename> <simSize> <filterSize> <A> <B> <C>\n";
+		exit(1);
+	}
+	std::ofstream output(argv[1]);
+	simSize = std::stoul(argv[2]);
+	filterSize = std::stoul(argv[3]);
+	A = std::stod(argv[4]);
+	B = std::stod(argv[5]);
+	C = std::stod(argv[6]);
+	srand(1);
 	int currentSize = simStart;
 	SquareMesh* mesh;
 	int collisions = 1;
@@ -66,12 +80,12 @@ int main() {
 					walker = next;
 				}
 			}
-			printf("currentSize:%d, collisions: %d\n", currentSize, collisions);
+			//printf("currentSize:%d, collisions: %d\n", currentSize, collisions);
 		}
 		currentSize *= 2;
 		delete edges;
 	}
-	mesh->output();
+	mesh->output(output);
 	delete mesh;
 	return 0;
 }
