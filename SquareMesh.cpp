@@ -49,9 +49,12 @@ void SquareMesh::output(std::ofstream& output) {
 	for (unsigned i = 0; i < xlength; i++) {
 		for (unsigned j = 0; j < ylength; j++) {
 			if (vals[i][j]) {
-				output << "1 ";
+				output << "1";
 			} else {
-				output << "0 ";
+				output << "0";
+			}
+			if (j != ylength-1) {
+				output << " ";
 			}
 		}
 		output << "\n";
