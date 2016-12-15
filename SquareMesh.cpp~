@@ -140,7 +140,7 @@ Loc** SquareMesh::matrix(const Loc& start, const Loc& collision) {
 	ret[1]=negatives;
 	//printf("start: %d, %d, collision: %d, %d\n", start.x, start.y, collision.x, collision.y);
 	int switchXY = abs(start.y-collision.y) != 1 ? 0 : 1;
-	int side  = start.x > collision.x || start.y > collision.y ? -1 : 1;
+	int side  = start.x > collision.x || start.y > collision.y ? 1 : -1;
 	for (int i = 0; i < fullLength; i++) {
 		for (int j = 0; j < filterLength+1; j++) {
 			int dx = switchXY ? i-filterLength : side * j -side;

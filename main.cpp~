@@ -63,6 +63,7 @@ int main(int argc, char* argv[]) {
 		int edgesLength = currentSize*4-4;
 		while (!onEdge) { // Simulation Loop
 			Loc walker;
+			
 			walker = edges[rand()%edgesLength];
 			int collided = 0;
 			while (!collided) { // Randomly move walker
