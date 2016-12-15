@@ -154,8 +154,8 @@ Loc** SquareMesh::matrix(const Loc& start, const Loc& collision) {
 		for (int j = 1; j < filterLength+1; j++) {
 			int dx = switchXY ? i-filterLength : -side * j;
 			int dy = switchXY ? -side * j : i-filterLength;
-			negatives[(filterLength)*i+j].x = (collision.x+dx);
-			negatives[(filterLength)*i+j].y = (collision.y+dy);
+			negatives[(filterLength)*i+j-1].x = (collision.x+dx);
+			negatives[(filterLength)*i+j-1].y = (collision.y+dy);
 		}
 	}
 	return ret;

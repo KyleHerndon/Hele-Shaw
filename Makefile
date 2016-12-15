@@ -12,5 +12,8 @@ main.o: main.cpp
 SquareMesh.o: SquareMesh.cpp SquareMesh.h Mesh.h
 	$(CC) $(CFLAGS) -c SquareMesh.cpp
 
+TriangularMesh.o: TriangularMesh.cpp TriangularMesh.h Mesh.h
+	$(CC) $(CFLAGS) -c TriangularMesh.cpp
+
 clean:
 	rm *.o

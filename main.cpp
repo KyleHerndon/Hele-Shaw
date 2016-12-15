@@ -9,8 +9,8 @@
 #include "SquareMesh.h"
 
 #define simStart 16 // keep at powers of 2
-unsigned simSize = 256; // keep at powers of 2
-unsigned filterSize = 2; // edges of length 2*filterSize+1
+int simSize = 256; // keep at powers of 2
+int filterSize = 2; // edges of length 2*filterSize+1
 double A = 1.0;
 double B = 0.5;
 double C = 0.0;
@@ -18,12 +18,17 @@ double C = 0.0;
 static int nl(Mesh* mesh, const Loc& start, const Loc& end) {
 	int ret = 0;
 	Loc** locs = mesh->matrix(start, end);
+	printf("Start\n");
 	for (int i = 0; i < filterSize*(filterSize*2+1); i++) {
 		ret += (mesh->value(locs[0][i]) > 0);
+		printf("loc: %d, %d\n", start.x-locs[1][i].x, start.y-locs[0][i].y);
 	}
+	printf("Section\n");
 	for (int i = 0; i < filterSize*(filterSize*2+1); i++) {
 		ret += (mesh->value(locs[1][i]) == 0);
+		printf("loc: %d, %d\n", start.x-locs[1][i].x, start.y-locs[1][i].y);
 	}
+	exit(1);
 	delete locs[0];
 	delete locs[1];
 	delete locs;

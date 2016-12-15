@@ -1,13 +1,12 @@
 #include "Mesh.h"
-
-class SquareMesh : public Mesh {
+class TriangularMesh : public Mesh {
 	public:
-		~SquareMesh();
-		SquareMesh(int xlength, int ylength, int filterLength);
-		SquareMesh(const SquareMesh& mesh);
+		~TriangularMesh();
+		TriangularMesh(int length, int filterLength);
+		TriangularMesh(const TriangularMesh& mesh);
 		int value(const Loc& c); // 0 is empty, 1 is occupied, -1 DNE
 		void value(const Loc& c, int value);
-		void output(std::ofstream& output);
+		void output(ifstream output);
 		int valid(const Loc& c);
 		int neighbors();
 		Loc* neighbors(const Loc& c);
@@ -15,7 +14,6 @@ class SquareMesh : public Mesh {
 		Loc** matrix(const Loc& start, const Loc& collision);
 	private:
 		int** vals;
-		int xlength;
-		int ylength;
+		int length;
 		int filterLength;
 };
