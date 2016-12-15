@@ -85,7 +85,6 @@ def main():
   hull = ConvexHull(indices)
   area2 = hull.volume
   print(area1/area2,file=f2)
-  print(area1/area2)
   #convert the edge points to x and y coordinates
   x,y = convert_to_points(boundary)
   plt.figure(1)
