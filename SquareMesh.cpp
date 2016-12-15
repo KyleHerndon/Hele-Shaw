@@ -7,15 +7,15 @@
 #include "SquareMesh.h"
 
 SquareMesh::~SquareMesh(){
-	for (unsigned i = 0; i < ylength; i++) {
+	for (int i = 0; i < ylength; i++) {
 		delete vals[i];
 	}
 	delete vals;
 }
 
-SquareMesh::SquareMesh(unsigned xlength, unsigned ylength, unsigned filterLength) {
+SquareMesh::SquareMesh(int xlength, int ylength, int filterLength) {
 	vals = new int*[ylength];
-	for (unsigned i = 0; i < ylength; i++) {
+	for (int i = 0; i < ylength; i++) {
 		vals[i] = new int[xlength];
 	}
 	vals[xlength/2][ylength/2]=1; // set the element near the center to be occupied
@@ -29,7 +29,7 @@ SquareMesh::SquareMesh(const SquareMesh& mesh) {
 	this->ylength = mesh.ylength*2;
 	this->filterLength = mesh.filterLength;
 	this->vals = new int*[this->ylength];
-	for (unsigned i = 0; i < this->ylength; i++) {
+	for (int i = 0; i < this->ylength; i++) {
 		this->vals[i] = new int[this->xlength]();
 		if (i >= this->ylength/4 && i < (3 * this->ylength)/4) {
 			std::memcpy(&this->vals[i][this->xlength/4],mesh.vals[i-this->ylength/4],mesh.xlength*sizeof(int));
@@ -38,16 +38,16 @@ SquareMesh::SquareMesh(const SquareMesh& mesh) {
 }
 
 int SquareMesh::value(const Loc& c) {
-	return vals[c.x%xlength][c.y%ylength];
+	return vals[((c.x%xlength)+xlength)%xlength][((c.y%ylength+ylength)%ylength)];
 }
 
 void SquareMesh::value(const Loc& c, int value) {
-	vals[c.x%xlength][c.y%ylength] = value;
+	vals[((c.x%xlength)+xlength)%xlength][((c.y%ylength+ylength)%ylength)] = value;
 }
 
 void SquareMesh::output(std::ofstream& output) {
-	for (unsigned i = 0; i < xlength; i++) {
-		for (unsigned j = 0; j < ylength; j++) {
+	for (int i = 0; i < xlength; i++) {
+		for (int j = 0; j < ylength; j++) {
 			if (vals[i][j]) {
 				output << "1";
 			} else {
@@ -107,7 +107,7 @@ Loc* SquareMesh::neighbors(const Loc& c) {
 Loc* SquareMesh::edges() {
 	Loc* ret = new Loc[2*xlength+2*ylength-4];
 	int index = 0;
-	for (unsigned i = 0; i < xlength; i++) {
+	for (int i = 0; i < xlength; i++) {
 		ret[index].x = i;
 		ret[index].y = 0;
 		index++;
@@ -115,7 +115,7 @@ Loc* SquareMesh::edges() {
 		ret[index].y = ylength-1;
 		index++;
 	}
-	for (unsigned i = 1; i < ylength-1; i++) {
+	for (int i = 1; i < ylength-1; i++) {
 		ret[index].x = 0;
 		ret[index].y = i;
 		index++;
@@ -130,31 +130,32 @@ Loc** SquareMesh::matrix(const Loc& start, const Loc& collision) {
 	/*if (abs(start.x-collision.x) + abs(start.y-collision.y) != 1) { // Check cells are adjacent
 		return NULL;
 	}*/
-	unsigned fullLength = 2*filterLength+1;
+	int fullLength = 2*filterLength+1;
 
-	Loc* positives = new Loc[fullLength * (filterLength)];
-	Loc* negatives = new Loc[fullLength * (filterLength+1)];
+	Loc* positives = new Loc[fullLength * (filterLength+1)];
+	Loc* negatives = new Loc[fullLength * (filterLength)];
 	Loc** ret = new Loc*[2];
 
 	ret[0]=positives;
 	ret[1]=negatives;
+	printf("start: %d, %d, collision: %d, %d\n", start.x, start.y, collision.x, collision.y);
 	int switchXY = abs(start.y-collision.y) != 1 ? 0 : 1;
 	int side  = start.x > collision.x || start.y > collision.y ? -1 : 1;
-	for (unsigned i = 0; i < fullLength; i++) {
-		for (unsigned j = 0; j < filterLength; j++) {
-			int dx = switchXY ? i : side * j;
-			int dy = switchXY ? side * j : i;
-			positives[filterLength*i+j].x = (collision.x-filterLength+dx) % xlength;
-			positives[filterLength*i+j].y = (collision.y-filterLength+dy) % ylength;
+	for (int i = 0; i < fullLength; i++) {
+		for (int j = 0; j < filterLength+1; j++) {
+			int dx = switchXY ? i-filterLength : side * j;
+			int dy = switchXY ? side * j : i-filterLength;
+			positives[(filterLength+1)*i+j].x = (collision.x+dx);
+			positives[(filterLength+1)*i+j].y = (collision.y+dy);
 		}
 	}
 
-	for (unsigned i = 0; i < fullLength; i++) {
-		for (unsigned j = 0; j < filterLength+1; j++) {
-			int dx = switchXY ? i : side * (j+filterLength);
-			int dy = switchXY ? side * (j+filterLength) : i;
-			negatives[(filterLength+1)*i+j].x = (collision.x-filterLength+dx) % xlength;
-			negatives[(filterLength+1)*i+j].y = (collision.y-filterLength+dy) % ylength;
+	for (int i = 0; i < fullLength; i++) {
+		for (int j = 1; j < filterLength+1; j++) {
+			int dx = switchXY ? i-filterLength : -side * j;
+			int dy = switchXY ? -side * j : i-filterLength;
+			negatives[(filterLength)*i+j].x = (collision.x+dx);
+			negatives[(filterLength)*i+j].y = (collision.y+dy);
 		}
 	}
 	return ret;
