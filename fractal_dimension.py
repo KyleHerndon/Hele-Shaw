@@ -1,6 +1,10 @@
+from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import threshold
+from scipy.spatial import ConvexHull
+import sys as sys
+import string as st
 
 def edge_find(image):
   #Edge find takes a bit-valued array (1s & 0s) and returns a modified array
@@ -9,7 +13,7 @@ def edge_find(image):
   dim = np.shape(image)
   m = dim[0]
   n = dim[1]
-  print(m,n)
+  #print(m,n)
   image_edge = np.zeros(dim)
   for i in range(1, m-1):
     for j in range(1, n-1):
@@ -66,13 +70,31 @@ def count_boxes(x, y, r):
 def main():
   #load the image from a bit-valued text-array
   image = np.loadtxt('out.csv',delimiter=' ')
+  f1=open('FD.out','a+')
+  f2=open('Convex.out','a+')
+  seed = int(sys.argv[1])
+  A = float(sys.argv[2])
+  B = float(sys.argv[3])
+  C = float(sys.argv[4])
   #image = np.abs(image - 1.0)
   #find the matching array with all interior points deleted
   boundary = edge_find(image)
+  indices = np.array(np.nonzero(boundary)).T
+  area1 = np.count_nonzero(image)
+  hull = ConvexHull(indices)
+  area2 = hull.volume
+  print(area1/area2,file=f2)
   #convert the edge points to x and y coordinates
   x,y = convert_to_points(boundary)
+  plt.figure(1)
   plt.plot(x,y,'.')
-  plt.show()
+  plt.title('Hele-Shaw A='+str(A)+' B='+str(B)+' C='+str(C))
+  plt.axis([0.0, 1.0, 0.0, 1.0])
+  plt.xlabel('x')
+  plt.ylabel('y')
+  output_filename = 'HS_A='+str(A)+'_B='+str(B)+'_C='+str(C)+'_'+str(seed)
+  output_filename = st.replace(output_filename,'.','p')
+  plt.savefig(output_filename+'.png')
   #Using 100 different ruler sizes, starting from a ruler of size 0.1 and going
   #to a ruler of size 0.4, set up the r array
   n = 3
@@ -88,11 +110,16 @@ def main():
   lr = np.log(r)
   ln = np.log(N)
   #Plot the resulting scaling law line.
+  plt.figure(2)
   plt.plot(lr,ln)
-  plt.show()
+  plt.title('Fractal Scaling for A=4.0, B=0.5, C=0.0')
+  plt.xlabel('log(Box Size)')
+  plt.ylabel('log(Number of Occupied Boxes)')
+  plt.savefig('Fractal_Scaling.png')
   #Find the slope of the line using linear least squares regression.
   slope = -(np.average(lr*ln) - np.average(lr)*np.average(ln)) / (np.average(lr**2) - np.average(lr)**2)
-  print('FD = ',slope)
+  print(slope,file=f1)
+  print(slope)
 #end def main
 
 if __name__ == '__main__':
