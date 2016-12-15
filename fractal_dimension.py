@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import threshold
+from scipy.spatial import ConvexHull
 
 def edge_find(image):
   #Edge find takes a bit-valued array (1s & 0s) and returns a modified array
@@ -69,6 +70,12 @@ def main():
   #image = np.abs(image - 1.0)
   #find the matching array with all interior points deleted
   boundary = edge_find(image)
+  #calculate the ratio of the area to the area of the convex hull
+  indices = np.array(np.nonzero(boundary)).T
+  area1 = np.count_nonzero(image)
+  hull = ConvexHull(indices)
+  area2 = hull.volume
+  print(area1/area2)
   #convert the edge points to x and y coordinates
   x,y = convert_to_points(boundary)
   plt.plot(x,y,'.')
